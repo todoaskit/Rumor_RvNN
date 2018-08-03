@@ -14,6 +14,7 @@ import numpy as np
 import time
 import datetime
 from evaluate import *
+from typing import List
 
 
 # tools
@@ -86,7 +87,7 @@ def construct_tree(tree):
 
 
 # load data
-def load_data(_label_path, _tree_path, _train_path, _test_path):
+def load_data(_label_path, _tree_path, _train_path, _test_path, _eid_pool: List[str]):
     print("loading tree label", end=' ')
     label_dic = {}
     for line in open(_label_path):
@@ -112,8 +113,9 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
     l1, l2, l3, l4 = 0, 0, 0, 0
     for eid in open(_train_path):
         # if c > 8: break
-
         eid = eid.rstrip()
+        if _eid_pool and str(eid) not in _eid_pool:
+            continue
         if eid not in label_dic:
             continue
         if eid not in tree_dic:
@@ -141,6 +143,8 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
     for eid in open(_test_path):
         # if c > 4: break
         eid = eid.rstrip()
+        if _eid_pool and str(eid) not in _eid_pool:
+            continue
         if eid not in label_dic:
             continue
         if eid not in tree_dic:
@@ -160,6 +164,7 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
         index_test.append(x_index)
         parent_num_test.append(parent_num)
         c += 1
+
     print(l1, l2, l3, l4)
     print("train no:", len(tree_train), len(word_train), len(index_train), len(parent_num_train), len(y_train))
     print("test no:", len(tree_test), len(word_test), len(index_test), len(parent_num_test), len(y_test))
@@ -172,12 +177,12 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
 # MAIN
 
 def run(_vocabulary_size, _hidden_dim, _n_class, _n_epoch, _learning_rate,
-        _label_path, _tree_path, _train_path, _test_path):
+        _label_path, _tree_path, _train_path, _test_path, _eid_pool):
 
     # 1. load tree & word & index & label
     tree_train, word_train, index_train, parent_num_train, y_train, \
     tree_test, word_test, index_test, parent_num_test, y_test = load_data(
-        _label_path, _tree_path, _train_path, _test_path
+        _label_path, _tree_path, _train_path, _test_path, _eid_pool
     )
 
     # 2. ini RNN model
@@ -303,5 +308,6 @@ if __name__ == '__main__':
         _tree_path='../resource/data.TD_RvNN.vol_' + str(vocabulary_size) + '.txt',
         _train_path="../nfold/RNNtrainSet_" + obj + str(fold) + "_tree.txt",
         _test_path="../nfold/RNNtestSet_" + obj + str(fold) + "_tree.txt",
+        _eid_pool=[],
     )
 

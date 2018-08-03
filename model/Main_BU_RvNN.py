@@ -14,7 +14,7 @@ import time
 import datetime
 import numpy as np
 from evaluate import *
-from pprint import pprint
+from typing import List
 
 
 # tools
@@ -85,7 +85,7 @@ def construct_tree(tree):
 
 
 # load data
-def load_data(_label_path, _tree_path, _train_path, _test_path):
+def load_data(_label_path, _tree_path, _train_path, _test_path, _eid_pool: List[str]):
     print("loading tree label", end=' ')
     label_dic = {}
     for line in open(_label_path):
@@ -111,6 +111,8 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
     for eid in open(_train_path):
         # if c > 8: break
         eid = eid.rstrip()
+        if _eid_pool and str(eid) not in _eid_pool:
+            continue
         if eid not in label_dic.keys():
             continue
         if eid not in tree_dic.keys():
@@ -137,6 +139,8 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
     for eid in open(_test_path):
         # if c > 4: break
         eid = eid.rstrip()
+        if _eid_pool and str(eid) not in _eid_pool:
+            continue
         if eid not in label_dic.keys():
             continue
         if eid not in tree_dic.keys():
@@ -166,11 +170,11 @@ def load_data(_label_path, _tree_path, _train_path, _test_path):
 
 # MAIN
 def run(_vocabulary_size, _hidden_dim, _n_class, _n_epoch, _learning_rate,
-        _label_path, _tree_path, _train_path, _test_path):
+        _label_path, _tree_path, _train_path, _test_path, _eid_pool):
     
     # 1. load tree & word & index & label
     tree_train, word_train, index_train, y_train, tree_test, word_test, index_test, y_test = load_data(
-        _label_path, _tree_path, _train_path, _test_path
+        _label_path, _tree_path, _train_path, _test_path, _eid_pool
     )
 
     # 2. ini RNN model
@@ -225,8 +229,7 @@ def run(_vocabulary_size, _hidden_dim, _n_class, _n_epoch, _learning_rate,
                 # print j
                 prediction.append(model.predict_up(word_test[j], index_test[j], tree_test[j]))
             res = evaluation_4class(prediction, y_test)
-            print('results:')
-            pprint(res)
+            print('results:', res)
             # floss.write(str(res)+'\n')
             # floss.flush()
             sys.stdout.flush()
@@ -266,4 +269,5 @@ if __name__ == '__main__':
         _tree_path='../resource/data.BU_RvNN.vol_' + str(vocabulary_size) + tag + '.txt',
         _train_path="../nfold/RNNtrainSet_" + obj + str(fold) + "_tree.txt",
         _test_path="../nfold/RNNtestSet_" + obj + str(fold) + "_tree.txt",
+        _eid_pool=[],
     )
