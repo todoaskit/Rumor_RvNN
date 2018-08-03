@@ -236,7 +236,7 @@ def run(_vocabulary_size, _hidden_dim, _n_class, _n_epoch, _learning_rate,
             loss, pred_y = model.train_step_up(word_train[i], index_train[i], parent_num_train[i], tree_train[i],
                                                y_train[i], _learning_rate)
             # print loss, pred_y
-            losses.append(round(loss, 2))
+            losses.append(round(float(loss), 2))
             '''if math.isnan(loss):
             #   continue 
                print loss, pred_y
