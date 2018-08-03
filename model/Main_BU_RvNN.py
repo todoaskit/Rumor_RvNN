@@ -248,8 +248,27 @@ def run(_vocabulary_size, _hidden_dim, _n_class, _n_epoch, _learning_rate,
     # floss.close()
 
 
+def run_wrapper(_fold, _eid_pool, _hidden_dim=100, _n_epoch=500, _learning_rate=0.005):
+    _obj = "Twitter1516"
+    _tag = ''
+    _vocabulary_size = 5000
+
+    run(
+        _vocabulary_size=_vocabulary_size,
+        _hidden_dim=100,
+        _n_class=4,
+        _n_epoch=500,
+        _learning_rate=0.005,
+        _label_path="../resource/" + _obj + "_label_All.txt",
+        _tree_path='../resource/data.BU_RvNN.vol_' + str(_vocabulary_size) + _tag + '.txt',
+        _train_path="../nfold/RNNtrainSet_" + _obj + str(_fold) + "_tree.txt",
+        _test_path="../nfold/RNNtestSet_" + _obj + str(_fold) + "_tree.txt",
+        _eid_pool=_eid_pool,
+    )
+
+
 if __name__ == '__main__':
-    obj = "Twitter15"  # choose dataset, you can choose either "Twitter15" or "Twitter16"
+    obj = "Twitter1516"  # choose dataset, you can choose either "Twitter15" or "Twitter16"
     fold = "3"  # fold index, choose from 0-4
     tag = ""
     vocabulary_size = 5000
