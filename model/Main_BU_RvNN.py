@@ -108,10 +108,12 @@ def load_data(_label_path, _tree_path, _train_path, _test_path, _eid_pool: List[
     print("loading train set", end=' ')
     tree_train, word_train, index_train, y_train, c = [], [], [], [], 0
     l1, l2, l3, l4 = 0, 0, 0, 0
+    unavailable_train_eids = set()
     for eid in open(_train_path):
         # if c > 8: break
         eid = eid.rstrip()
         if _eid_pool and str(eid) not in _eid_pool:
+            unavailable_train_eids.add(eid)
             continue
         if eid not in label_dic.keys():
             continue
@@ -136,10 +138,12 @@ def load_data(_label_path, _tree_path, _train_path, _test_path, _eid_pool: List[
     print("loading test set", end=' ')
     tree_test, word_test, index_test, y_test, c = [], [], [], [], 0
     l1, l2, l3, l4 = 0, 0, 0, 0
+    unavailable_test_eids = set()
     for eid in open(_test_path):
         # if c > 4: break
         eid = eid.rstrip()
         if _eid_pool and str(eid) not in _eid_pool:
+            unavailable_test_eids.add(eid)
             continue
         if eid not in label_dic.keys():
             continue
@@ -165,6 +169,7 @@ def load_data(_label_path, _tree_path, _train_path, _test_path, _eid_pool: List[
     print("test no:", len(tree_test), len(word_test), len(index_test), len(y_test))
     print("dim1 for 0:", len(tree_train[0]), len(word_train[0]), len(index_train[0]))
     print("case 0:", tree_train[0][0], word_train[0][0], index_train[0][0])
+    print('Unavailable eids, train: {}, test: {}'.format(len(unavailable_train_eids), len(unavailable_test_eids)))
     return tree_train, word_train, index_train, y_train, tree_test, word_test, index_test, y_test
 
 
@@ -255,10 +260,10 @@ def run_wrapper(path_root, _fold, _eid_pool, _hidden_dim=100, _n_epoch=500, _lea
 
     run(
         _vocabulary_size=_vocabulary_size,
-        _hidden_dim=100,
+        _hidden_dim=_hidden_dim,
         _n_class=4,
-        _n_epoch=500,
-        _learning_rate=0.005,
+        _n_epoch=_n_epoch,
+        _learning_rate=_learning_rate,
         _label_path=path_root + "/resource/" + _obj + "_label_All.txt",
         _tree_path=path_root + '/resource/data.BU_RvNN.vol_' + str(_vocabulary_size) + _tag + '.txt',
         _train_path=path_root + "/nfold/RNNtrainSet_" + _obj + str(_fold) + "_tree.txt",
