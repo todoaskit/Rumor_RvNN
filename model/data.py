@@ -1,5 +1,25 @@
 import os
 import random
+from format_story import *
+
+
+def export_with_order():
+    stories = get_formatted_stories(data_path='../../../data')
+    story_ids = [str(s) + '\n' for s in list(stories.story_to_id.keys())]
+
+    train_ratio = 1 - 1/5
+    train_bound = int(len(story_ids)*train_ratio)
+
+    train_lines = story_ids[:train_bound]
+    test_lines = story_ids[train_bound:]
+
+    train_merged_file = open("../nfold/RNNtrainSet_Twitter1516" + str(6) + "_tree.txt", 'w')
+    train_merged_file.writelines(train_lines)
+    train_merged_file.close()
+
+    test_merged_file = open("../nfold/RNNtestSet_Twitter1516" + str(6) + "_tree.txt", 'w')
+    test_merged_file.writelines(test_lines)
+    test_merged_file.close()
 
 
 def merge_nfold_1516(_fold):
@@ -47,6 +67,4 @@ def merge_labels_1516():
 
 
 if __name__ == '__main__':
-    for i in range(5):
-        merge_nfold_1516(str(i))
-    merge_labels_1516()
+    export_with_order()
