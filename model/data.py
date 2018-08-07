@@ -1,4 +1,5 @@
 import os
+import random
 
 
 def merge_nfold_1516(_fold):
@@ -18,6 +19,13 @@ def merge_nfold_1516(_fold):
 
     train_lines = list(set(train_lines))
     test_lines = list(set(test_lines))
+    total_lines = list(set(train_lines + test_lines))
+    random.shuffle(total_lines)
+
+    train_ratio = 1 - 1/5
+    train_bound = int(len(total_lines)*train_ratio)
+    train_lines = total_lines[:train_bound]
+    test_lines = total_lines[train_bound:]
 
     train_merged_file = open("../nfold/RNNtrainSet_Twitter1516" + str(_fold) + "_tree.txt", 'w')
     train_merged_file.writelines(train_lines)
@@ -39,6 +47,6 @@ def merge_labels_1516():
 
 
 if __name__ == '__main__':
-    merge_nfold_1516('2')
+    for i in range(5):
+        merge_nfold_1516(str(i))
     merge_labels_1516()
-
