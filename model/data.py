@@ -3,21 +3,31 @@ import random
 from format_story import *
 
 
-def export_with_order():
+def get_train_and_test(lst, fold, total_fold, base=10):
+    ratio = 1/total_fold
+    start = int(len(lst) * (ratio * (- fold + base)))
+    end = int(len(lst) * (ratio * (- fold + base + 1)))
+    test = lst[start:end]
+    train = [x for x in lst if x not in test]
+    return train, test
+
+
+def export_with_order(fold, total_fold=5):
+    """
+    :param fold: 6, 7, 8, 9, 10
+    :param total_fold: default 5
+    :return:
+    """
     stories = get_formatted_stories(data_path='../../../data')
     story_ids = [str(s) + '\n' for s in list(stories.story_to_id.keys())]
 
-    train_ratio = 1 - 1/5
-    train_bound = int(len(story_ids)*train_ratio)
+    train_lines, test_lines = get_train_and_test(story_ids, fold, total_fold)
 
-    train_lines = story_ids[:train_bound]
-    test_lines = story_ids[train_bound:]
-
-    train_merged_file = open("../nfold/RNNtrainSet_Twitter1516" + str(6) + "_tree.txt", 'w')
+    train_merged_file = open("../nfold/RNNtrainSet_Twitter1516" + str(fold) + "_tree.txt", 'w')
     train_merged_file.writelines(train_lines)
     train_merged_file.close()
 
-    test_merged_file = open("../nfold/RNNtestSet_Twitter1516" + str(6) + "_tree.txt", 'w')
+    test_merged_file = open("../nfold/RNNtestSet_Twitter1516" + str(fold) + "_tree.txt", 'w')
     test_merged_file.writelines(test_lines)
     test_merged_file.close()
 
@@ -67,4 +77,4 @@ def merge_labels_1516():
 
 
 if __name__ == '__main__':
-    export_with_order()
+    export_with_order(6)
