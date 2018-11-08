@@ -95,6 +95,7 @@ def evaluation_2class(prediction, y):  # 4 dim
 
 
 def evaluation_4class(prediction, y):  # 4 dim
+    confusion_matrix = [[0 for _ in range(4)] for _ in range(4)]
     t_p1, f_p1, f_n1, t_n1 = 0, 0, 0, 0
     t_p2, f_p2, f_n2, t_n2 = 0, 0, 0, 0
     t_p3, f_p3, f_n3, t_n3 = 0, 0, 0, 0
@@ -114,6 +115,8 @@ def evaluation_4class(prediction, y):  # 4 dim
         # Pre, Recall, F    
         act = str(y_i.index(max(y_i)) + 1)
         pre = str(p_i.index(max(p_i)) + 1)
+
+        confusion_matrix[int(pre) - 1][int(act) - 1] += 1
 
         # for class 1
         if act == '1' and pre == '1':
@@ -184,11 +187,21 @@ def evaluation_4class(prediction, y):  # 4 dim
     rmse_all_3 = round((rmse3 / len(y)) ** 0.5, 4)
     rmse_all_4 = round((rmse4 / len(y)) ** 0.5, 4)
     rmse_all_avg = round((rmse_all_1 + rmse_all_2 + rmse_all_3 + rmse_all_4) / 4, 4)
+
+    print(confusion_matrix)
+    for col_idx in range(len(confusion_matrix[0])):
+        col_sum = 0
+        for row_idx in range(len(confusion_matrix)):
+            col_sum += confusion_matrix[row_idx][col_idx]
+        for row_idx in range(len(confusion_matrix)):
+            confusion_matrix[row_idx][col_idx] /= col_sum
+
     return ['acc:', accuracy_all, 'Favg:', micro_f, rmse_all, rmse_all_avg,
             'C1:', accuracy_1, precision_1, recall_1, f1,
             'C2:', accuracy_2, precision_2, recall_2, f2,
             'C3:', accuracy_3, precision_3, recall_3, f3,
-            'C4:', accuracy_4, precision_4, recall_4, f4]
+            'C4:', accuracy_4, precision_4, recall_4, f4,
+            'Confusion_Matrix', confusion_matrix]
 
 
 def write2Predict_oneVSall(prediction, y, result_path):  # no. of time series
